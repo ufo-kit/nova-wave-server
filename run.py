@@ -61,8 +61,6 @@ def create(map_id, data_path, subset, origin, dimensions, size):
         "rescale width={size} height={size} ! " \
         "map-slice number={number} ! write filename={output}".format(**parameters)
 
-    print cmd
-
     output = subprocess.call(shlex.split(cmd))
 
 

@@ -13,6 +13,7 @@ def check_range(l):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--server', type=str, default='http://localhost:5000')
     parser.add_argument('--origin', type=float, nargs='+', default=[0.0, 0.0, 0.0])
     parser.add_argument('--dimensions', type=float, nargs='+', default=[1.0, 1.0])
     parser.add_argument('--subset', type=int, default=0)
@@ -33,7 +34,7 @@ if __name__ == '__main__':
     data = dict(origin=args.origin, dimensions=args.dimensions, size=args.size,
                 subset=args.subset, path=args.path)
 
-    r = requests.post('http://localhost:5000/maps', json=data)
+    r = requests.post('{}/maps'.format(args.server), json=data)
     r.raise_for_status()
     url = r.headers['Location']
 

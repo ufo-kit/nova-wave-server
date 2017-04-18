@@ -4,8 +4,6 @@ The ufo-wave-server is a server that generates slice maps from raw data for
 consumption with the WAVE JavaScript client renderer and uses the UFO framework
 to do the low-level image processing.
 
-## Interface
-
 The client has to
 
 1. POST a request to /maps with a JSON body describing the bounding box and
@@ -16,7 +14,10 @@ The client has to
 4. If successful the /queue/<id> resource returns a Location header to
    /maps/<id> containing the slice map
 
-#### General parameters
+See the `test.py` script for an example.
+
+
+## General parameters
 
 All parameters to the POST request have to be JSON encoded and send within a
 single JSON object.
@@ -32,7 +33,7 @@ single JSON object.
 * `subset` specifies the nth slice map, i.e. subset 0 contains the first 64
   slices, 1 the slices 65 to 128 and so on.
 
-### Response
+## Response
 
-The result is either a JPEG of size `sw`×`sh` containing the slice map or a JSON
-response containing an error message field.
+The result is either a JPEG of size 8 × `size` containing the slice map or a
+JSON response containing an error message field.

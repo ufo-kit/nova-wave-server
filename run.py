@@ -3,12 +3,13 @@ import hashlib
 import subprocess
 import tifffile
 import shlex
+import requests
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-
+app.config['NOVA_API_URL'] = 'http://localhost:5000/api'
 jobs = {}
 
 
@@ -44,7 +45,7 @@ def create(map_id, data_path, subset, origin, dimensions, size):
 
     x, y, z = origin
     w, h = dimensions
-    files = [os.path.join(data_path, f) for f in sorted(os.listdir(data_path))]
+    files = [os.path.join(data_path, f) for f in sorted(os.listdir(data_path)) if f.endswith('tif')]
     data = tifffile.imread(files[0])
     height, width = data.shape
     number = 8 * 8
@@ -66,7 +67,15 @@ def create(map_id, data_path, subset, origin, dimensions, size):
 
 @app.route('/maps', methods=['POST'])
 def make_map():
-    path = request.json['path']
+    # XXX: improve error handling A LOT
+
+    # authenticate for path access
+    headers = {'Auth-Token': request.json['token']}
+    url = '{}/datasets/{}'.format(app.config['NOVA_API_URL'], request.json['dataset'])
+    r = requests.get(url, headers=headers)
+
+    # generate a unique map_id from the parameters
+    path = os.path.join(r.json()['path'], 'slices')
     subset = request.json.get('subset', 0)
     origin = request.json.get('origin', [0.0, 0.0, 0.0])
     dimensions = request.json.get('dimensions', [1.0, 1.0])

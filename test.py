@@ -18,7 +18,8 @@ if __name__ == '__main__':
     parser.add_argument('--dimensions', type=float, nargs='+', default=[1.0, 1.0])
     parser.add_argument('--subset', type=int, default=0)
     parser.add_argument('--size', type=int, default=256)
-    parser.add_argument('--path', type=str, required=True)
+    parser.add_argument('--token', type=str, required=True)
+    parser.add_argument('--dataset', type=str, required=True)
     args = parser.parse_args()
 
     if len(args.origin) != 3:
@@ -31,8 +32,8 @@ if __name__ == '__main__':
     check_range(args.dimensions)
 
     # POST request
-    data = dict(origin=args.origin, dimensions=args.dimensions, size=args.size,
-                subset=args.subset, path=args.path)
+    data = dict(user=args.user, token=args.token, dataset=args.dataset,
+                origin=args.origin, dimensions=args.dimensions, size=args.size, subset=args.subset)
 
     r = requests.post('{}/maps'.format(args.server), json=data)
     r.raise_for_status()

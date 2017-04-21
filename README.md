@@ -22,7 +22,12 @@ See the `test.py` script for an example.
 All parameters to the POST request have to be JSON encoded and send within a
 single JSON object.
 
-* `path` specifies the path to a directory containing the raw full-resolution slices.
+* In order to resolve the path to the actual slices we have to authenticate
+  against the NOVA REST API server, for this the user's `token` must be
+  specified.
+* `dataset` is in the form of `collection/dataset` and specifies the path to a
+  directory containing the raw full-resolution slices in a subdirectory called
+  `slices`.
 * The `origin` array containing three float numbers with values between 0 and 1
   specify the *relative* coordinates of the origin of the bounding box. If the
   array is not given, all coordinates are assumed to be zero.
@@ -32,6 +37,7 @@ single JSON object.
   given, a default of 256 pixels is used.
 * `subset` specifies the nth slice map, i.e. subset 0 contains the first 64
   slices, 1 the slices 65 to 128 and so on.
+
 
 ## Response
 

@@ -32,8 +32,8 @@ if __name__ == '__main__':
     check_range(args.dimensions)
 
     # POST request
-    data = dict(user=args.user, token=args.token, dataset=args.dataset,
-                origin=args.origin, dimensions=args.dimensions, size=args.size, subset=args.subset)
+    data = dict(token=args.token, dataset=args.dataset, origin=args.origin,
+                dimensions=args.dimensions, size=args.size, subset=args.subset)
 
     r = requests.post('{}/maps'.format(args.server), json=data)
     r.raise_for_status()

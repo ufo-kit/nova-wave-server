@@ -24,8 +24,11 @@ def identifier_to_path(map_id):
 
 def abort_for_status(response):
     if response.status_code != 200:
-        message = json.loads(response.text)
-        abort(response.status_code, message['message'])
+        try:
+            message = json.loads(response.text)
+            abort(response.status_code, message['message'])
+        except ValueError:
+            abort(response.status_code)
 
 
 def create(map_id, data_path, subset, origin, dimensions, size):

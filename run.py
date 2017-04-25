@@ -13,6 +13,11 @@ app.config['DEBUG'] = True
 app.config['NOVA_API_URL'] = 'http://localhost:5000/api'
 jobs = {}
 
+def check_range(l):
+    for x in l:
+        if x < 0.0 or x > 1.0:
+            abort(400, "Error: numbers must be within [0.0, 1.0].")
+
 
 def split_identifier(map_id):
     return map_id[:2], map_id[2:4], map_id[4:]
@@ -84,10 +89,14 @@ def make_map():
     abort_for_status(r)
 
     # generate a unique map_id from the parameters
+    origin = request.json.get('origin', [0.0, 0.0, 0.0])
+    check_range(origin)
+
+    dimensions = request.json.get('dimensions', [1.0, 1.0])
+    check_range(dimensions)
+
     path = os.path.join(r.json()['path'], 'slices')
     subset = request.json.get('subset', 0)
-    origin = request.json.get('origin', [0.0, 0.0, 0.0])
-    dimensions = request.json.get('dimensions', [1.0, 1.0])
     size = request.json.get('size', 256)
     identifier = "p={},s={},o={},d={}".format(path, subset, origin, dimensions)
     map_id = hashlib.sha256(identifier).hexdigest()

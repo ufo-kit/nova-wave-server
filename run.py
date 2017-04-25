@@ -4,6 +4,7 @@ import subprocess
 import tifffile
 import shlex
 import requests
+import json
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
 
@@ -19,6 +20,12 @@ def split_identifier(map_id):
 
 def identifier_to_path(map_id):
     return os.path.join('cache', *split_identifier(map_id)) + '.jpg'
+
+
+def abort_for_status(response):
+    if response.status_code != 200:
+        message = json.loads(response.text)
+        abort(response.status_code, message['message'])
 
 
 def create(map_id, data_path, subset, origin, dimensions, size):
@@ -67,12 +74,11 @@ def create(map_id, data_path, subset, origin, dimensions, size):
 
 @app.route('/maps', methods=['POST'])
 def make_map():
-    # XXX: improve error handling A LOT
-
     # authenticate for path access
     headers = {'Auth-Token': request.json['token']}
     url = '{}/datasets/{}'.format(app.config['NOVA_API_URL'], request.json['dataset'])
     r = requests.get(url, headers=headers)
+    abort_for_status(r)
 
     # generate a unique map_id from the parameters
     path = os.path.join(r.json()['path'], 'slices')

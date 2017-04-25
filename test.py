@@ -5,11 +5,6 @@ import argparse
 import requests
 
 
-def check_range(l):
-    for x in l:
-        if x < 0.0 or x > 1.0:
-            sys.exit("Error: numbers must be within [0.0, 1.0].")
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -27,9 +22,6 @@ if __name__ == '__main__':
 
     if len(args.dimensions) != 2:
         sys.exit("Error: `dimensions' must be a list with two elements.")
-
-    check_range(args.origin)
-    check_range(args.dimensions)
 
     # POST request
     data = dict(token=args.token, dataset=args.dataset, origin=args.origin,

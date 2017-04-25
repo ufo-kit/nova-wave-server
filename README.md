@@ -6,13 +6,14 @@ to do the low-level image processing.
 
 The client has to
 
-1. POST a request to /maps with a JSON body describing the bounding box and
+1. POST a request to `/maps` with a JSON body describing the bounding box and
    output parameters.
-2. The POST request returns a Location header to a /queue/<id> URL
-3. The client asks the /queue/<id> resource if slice map generation is finished
-   or still going on
-4. If successful the /queue/<id> resource returns a Location header to
-   /maps/<id> containing the slice map
+2. Follow the location header to a `/queue/<id>` URL as a result of the
+   successful POST request.
+3. GET the `/queue/<id>` resource if slice map generation is finished
+   or still going on.
+4. Follow the location header `/queue/<id>` to `/maps/<id>` containing the slice
+   map
 
 See the `test.py` script for an example.
 

@@ -15,6 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--size', type=int, default=256)
     parser.add_argument('--token', type=str, required=True)
     parser.add_argument('--dataset', type=str, required=True)
+    parser.add_argument('--user', type=str, required=True)
     args = parser.parse_args()
 
     if len(args.origin) != 3:
@@ -24,7 +25,7 @@ if __name__ == '__main__':
         sys.exit("Error: `dimensions' must be a list with two elements.")
 
     # POST request
-    data = dict(token=args.token, dataset=args.dataset, origin=args.origin,
+    data = dict(token=args.token, user=args.user, dataset=args.dataset, origin=args.origin,
                 dimensions=args.dimensions, size=args.size, subset=args.subset)
 
     r = requests.post('{}/maps'.format(args.server), json=data)

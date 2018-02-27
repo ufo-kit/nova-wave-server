@@ -84,7 +84,7 @@ def create(map_id, data_path, subset, origin, dimensions, size):
 def make_map():
     # authenticate for path access
     headers = {'Auth-Token': request.json['token']}
-    url = '{}/datasets/{}'.format(app.config['NOVA_API_URL'], request.json['dataset'])
+    url = '{}/datasets/{}/{}'.format(app.config['NOVA_API_URL'], request.json['user'], request.json['dataset'])
     r = requests.get(url, headers=headers)
     abort_for_status(r)
 
@@ -140,4 +140,5 @@ def check_queue(map_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    print('Running')
+    app.run(debug=True, host='127.0.0.1', port=5001)

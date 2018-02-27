@@ -8,7 +8,7 @@ import requests
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--server', type=str, default='http://localhost:5000')
+    parser.add_argument('--server', type=str, default='http://localhost:5001')
     parser.add_argument('--origin', type=float, nargs='+', default=[0.0, 0.0, 0.0])
     parser.add_argument('--dimensions', type=float, nargs='+', default=[1.0, 1.0])
     parser.add_argument('--subset', type=int, default=0)

@@ -103,6 +103,7 @@ def make_map():
     subset = request.json.get('subset', 0)
     size = request.json.get('size', 256)
     identifier = "p={},s={},o={},d={}".format(path, subset, origin, dimensions)
+    identifier = identifier.encode('utf-8')
     map_id = hashlib.sha256(identifier).hexdigest()
 
     args = (map_id, path, subset, origin, dimensions, size)

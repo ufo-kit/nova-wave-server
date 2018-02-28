@@ -7,10 +7,14 @@ import requests
 import json
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
+from flask_script import Manager
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['NOVA_API_URL'] = 'http://localhost:5000/api'
+
+manager = Manager(app)
+
 jobs = {}
 
 def check_range(l):
@@ -140,5 +144,4 @@ def check_queue(map_id):
 
 
 if __name__ == '__main__':
-    print('Running')
-    app.run(debug=True, host='127.0.0.1', port=5001)
+    manager.run()

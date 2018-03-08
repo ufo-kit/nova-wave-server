@@ -5,6 +5,8 @@ import tifffile
 import shlex
 import requests
 import json
+import atexit
+import socket
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
 from flask_script import Manager
@@ -12,6 +14,10 @@ from flask_script import Manager
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['NOVA_API_URL'] = 'http://localhost:5000/api'
+
+SERVICE_NAME = 'wave-slicemap-server'
+SERVICE_DESCRIPTION = """WAVE slice map server"""
+SERVICE_SECRET = '123'
 
 manager = Manager(app)
 
@@ -144,5 +150,31 @@ def check_queue(map_id):
     return response
 
 
+def get_local_ip_address():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
+
+
+def register(host):
+    data = dict(name=SERVICE_NAME,
+                url='http://{}:{}'.format(get_local_ip_address(), 5000),
+                secret=SERVICE_SECRET)
+    requests.post('/'.join((host, 'services')), data=data)
+
+
+def shutdown(host):
+    data = dict(secret=SERVICE_SECRET)
+    requests.delete('/'.join((host, 'service', SERVICE_NAME)), data=data)
+
+
+@app.route('/service')
+def service():
+    data = dict(status='running')
+    return jsonify(data)
+
+
 if __name__ == '__main__':
+    register(app.config['NOVA_API_URL'])
+    atexit.register(shutdown, app.config['NOVA_API_URL'])
     manager.run()

@@ -10,10 +10,12 @@ import socket
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
 from flask_script import Manager
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['NOVA_API_URL'] = 'http://localhost:5000/api'
+CORS(app, expose_headers=['location'])
 
 SERVICE_NAME = 'wave-slicemap-server'
 SERVICE_DESCRIPTION = """WAVE slice map server"""

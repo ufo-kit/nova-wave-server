@@ -73,7 +73,7 @@ def create(map_id, data_path, subset, origin, dimensions, size):
     files = [os.path.join(data_path, f) for f in sorted(os.listdir(data_path)) if f.endswith('tif')]
     data = tifffile.imread(files[0])
     height, width = data.shape
-    number = 8 * 8
+    number = 16 * 16
     xa = int(x * width)
     ya = int(y * height)
 

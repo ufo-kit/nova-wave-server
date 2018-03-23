@@ -108,7 +108,9 @@ def make_map():
     dimensions = request.json.get('dimensions', [1.0, 1.0])
     check_range(dimensions)
 
-    path = os.path.join(r.json()['path'], 'slices')
+    path = os.path.join(r.json()['path'], 'slices_8bit')
+    path = path if os.path.exists(path) else os.path.join(r.json()['path'], 'slices')
+
     subset = request.json.get('subset', 0)
     size = request.json.get('size', 256)
     identifier = "p={},s={},o={},d={}".format(path, subset, origin, dimensions)

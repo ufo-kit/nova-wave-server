@@ -57,7 +57,8 @@ def create(map_id, data_path, subset, origin, dimensions, size):
     if not os.path.exists(data_path):
         app.logger.error('{} does not exist'.format(data_path))
         return -1
-    
+
+    app.logger.info('Processing data from {}'.format(data_path))
     first, second, name_prefix = split_identifier(map_id)
 
     path = os.path.join('cache', first)

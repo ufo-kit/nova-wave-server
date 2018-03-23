@@ -85,7 +85,7 @@ def create(map_id, data_path, subset, origin, dimensions, size):
                       size=size, number=number, start=subset * number)
 
     cmd = "ufo-launch read path={path} number={number} start={start} ! " \
-        "crop x={x} y={y} width={w} height={h} ! " \
+        "crop x={x} y={y} width={w} height={h} ! mask ! " \
         "rescale width={size} height={size} ! " \
         "map-slice number={number} ! write filename={output}".format(**parameters)
 

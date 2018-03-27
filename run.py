@@ -64,12 +64,18 @@ def create(map_id, data_path, subset, origin, dimensions, size):
     path = os.path.join('cache', first)
 
     if not os.path.exists(path):
-        os.mkdir(path)
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            pass
 
     path = os.path.join(path, second)
 
     if not os.path.exists(path):
-        os.mkdir(path)
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            pass
 
     x, y, z = origin
     w, h = dimensions

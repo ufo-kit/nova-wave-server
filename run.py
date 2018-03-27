@@ -85,16 +85,26 @@ def create(map_id, data_path, subset, origin, dimensions, size):
     number = 16 * 16
     xa = int(x * width)
     ya = int(y * height)
+    start = subset * number
+    slice_width = int(min(width - xa, w * width))
+    slice_height = int(min(height - ya, h * height))
 
-    parameters = dict(path=data_path, output=output_path,
-                      x=xa, y=ya, za=int(z * len(files)),
-                      w=int(min(width - xa, w * width)), h=int(min(height - ya, h * height)),
-                      size=size, number=number, start=subset * number)
+    if start >= len(files):
+        size *= 16
+        cmd = "ufo-launch dummy-data width={size} height={size} ! write filename={output}".format(size=size, output=output_path)
+    else:
+        parameters = dict(path=data_path, output=output_path,
+                          x=xa, y=ya, za=int(z * len(files)),
+                          w=slice_width, h=slice_height,
+                          size=size, number=number, start=start)
 
-    cmd = "ufo-launch read path={path} number={number} start={start} ! " \
-        "crop x={x} y={y} width={w} height={h} ! " \
-        "rescale width={size} height={size} ! " \
-        "map-slice number={number} ! write filename={output}".format(**parameters)
+        cmd = "ufo-launch read path={path} number={number} start={start} ! crop x={x} y={y} width={w} height={h} ! "
+
+        if w == 1.0 and h == 1.0:
+            cmd += "mask ! "
+
+        cmd += "rescale width={size} height={size} ! map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
+        cmd = cmd.format(**parameters)
 
     output = subprocess.call(shlex.split(cmd))
 

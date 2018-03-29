@@ -24,6 +24,7 @@ SERVICE_SECRET = '123'
 manager = Manager(app)
 
 jobs = {}
+subsets = {}
 
 def check_range(l):
     for x in l:
@@ -134,6 +135,7 @@ def make_map():
     identifier = "p={},s={},o={},d={}".format(path, subset, origin, dimensions)
     identifier = identifier.encode('utf-8')
     map_id = hashlib.sha256(identifier).hexdigest()
+    subsets[map_id] = subset
 
     args = (map_id, path, subset, origin, dimensions, size)
     process = Process(target=create, args=args)
@@ -157,7 +159,7 @@ def get_map(map_id):
 
 @app.route('/queue/<map_id>', methods=['GET'])
 def check_queue(map_id):
-    response = jsonify(status='done')
+    response = jsonify(status='done', subset=subsets[map_id])
     response.headers['location'] = url_for('get_map', map_id=map_id)
 
     if map_id not in jobs:

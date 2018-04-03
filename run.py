@@ -37,7 +37,7 @@ def split_identifier(map_id):
 
 
 def identifier_to_path(map_id):
-    return os.path.join('cache', *split_identifier(map_id)) + '.jpg'
+    return os.path.join('cache', *split_identifier(map_id))
 
 
 def abort_for_status(response):
@@ -49,7 +49,7 @@ def abort_for_status(response):
             abort(response.status_code)
 
 
-def create(map_id, data_path, subset, origin, dimensions, size):
+def create(map_id, data_path, subsets, origin, dimensions, size):
     output_path = identifier_to_path(map_id)
 
     if os.path.exists(output_path):
@@ -83,29 +83,28 @@ def create(map_id, data_path, subset, origin, dimensions, size):
     files = [os.path.join(data_path, f) for f in sorted(os.listdir(data_path)) if f.endswith('tif')]
     data = tifffile.imread(files[0])
     height, width = data.shape
+    del data
+
+    output_path += '/%05i.jpg'
     number = 16 * 16
+    total = number * subsets
     xa = int(x * width)
     ya = int(y * height)
-    start = subset * number
     slice_width = int(min(width - xa, w * width))
     slice_height = int(min(height - ya, h * height))
 
-    if start >= len(files):
-        size *= 16
-        cmd = "ufo-launch dummy-data width={size} height={size} ! write filename={output}".format(size=size, output=output_path)
-    else:
-        parameters = dict(path=data_path, output=output_path,
-                          x=xa, y=ya, za=int(z * len(files)),
-                          w=slice_width, h=slice_height,
-                          size=size, number=number, start=start)
+    parameters = dict(path=data_path, output=output_path,
+                      x=xa, y=ya, za=int(z * len(files)),
+                      w=slice_width, h=slice_height,
+                      size=size, number=number, total=total)
 
-        cmd = "ufo-launch read path={path} number={number} start={start} ! crop x={x} y={y} width={w} height={h} ! "
+    cmd = "ufo-launch read path={path} number={total} ! crop x={x} y={y} width={w} height={h} ! "
 
-        if w == 1.0 and h == 1.0:
-            cmd += "mask ! "
+    if w == 1.0 and h == 1.0:
+        cmd += "mask ! "
 
-        cmd += "rescale width={size} height={size} ! map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
-        cmd = cmd.format(**parameters)
+    cmd += "rescale width={size} height={size} ! map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
+    cmd = cmd.format(**parameters)
 
     output = subprocess.call(shlex.split(cmd))
 
@@ -130,14 +129,13 @@ def make_map():
     path = path if os.path.exists(path) else os.path.join(r.json()['path'], 'slices_8bit')
     path = path if os.path.exists(path) else os.path.join(r.json()['path'], 'slices')
 
-    subset = request.json.get('subset', 0)
+    subsets = request.json.get('subsets', 6)
     size = request.json.get('size', 256)
-    identifier = "p={},s={},o={},d={}".format(path, subset, origin, dimensions)
+    identifier = "p={},o={},d={}".format(path, origin, dimensions)
     identifier = identifier.encode('utf-8')
     map_id = hashlib.sha256(identifier).hexdigest()
-    subsets[map_id] = subset
 
-    args = (map_id, path, subset, origin, dimensions, size)
+    args = (map_id, path, subsets, origin, dimensions, size)
     process = Process(target=create, args=args)
     process.start()
     jobs[map_id] = process
@@ -147,19 +145,22 @@ def make_map():
     return response
 
 
-@app.route('/maps/<map_id>', methods=['GET'])
-def get_map(map_id):
+@app.route('/maps/<map_id>')
+@app.route('/maps/<map_id>/<subset>', methods=['GET'])
+def get_map(map_id, subset=None):
     path = identifier_to_path(map_id)
 
     if not os.path.exists(path):
         abort(404)
+
+    path += '/{:05}.jpg'.format(int(subset))
 
     return send_file(path, mimetype='image/jpeg')
 
 
 @app.route('/queue/<map_id>', methods=['GET'])
 def check_queue(map_id):
-    response = jsonify(status='done', subset=subsets[map_id])
+    response = jsonify(status='done')
     response.headers['location'] = url_for('get_map', map_id=map_id)
 
     if map_id not in jobs:

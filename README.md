@@ -12,8 +12,8 @@ The client has to
    successful POST request.
 3. GET the `/queue/<id>` resource if slice map generation is finished
    or still going on.
-4. Follow the location header `/queue/<id>` to `/maps/<id>` containing the slice
-   map
+4. Follow the location header `/queue/<id>` to `/maps/<id>/<subset>` containing
+   the slice map `<subset>`
 
 See the `test.py` script for an example.
 
@@ -36,8 +36,7 @@ single JSON object.
   1 specifies the *relative* width and height of the selected bounding box.
 * `size` specifies output size of a single slice within the slice map. If not
   given, a default of 256 pixels is used.
-* `subset` specifies the nth slice map, i.e. subset 0 contains the first 64
-  slices, 1 the slices 65 to 128 and so on.
+* `subsets` specifies the number of slice maps to generate.
 
 
 ## Response

@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         if r.json()['status'] == 'done':
             # Download image
-            url = r.headers['Location']
+            url = '{}/{}'.format(r.headers['Location'], args.subset)
             r = requests.get(url, stream=True)
             r.raise_for_status()
 

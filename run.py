@@ -7,6 +7,7 @@ import requests
 import json
 import atexit
 import socket
+import math
 from multiprocessing import Process
 from flask import Flask, request, jsonify, abort, url_for, send_file
 from flask_script import Manager
@@ -108,7 +109,7 @@ def create(map_id, data_path, subsets, origin, dimensions, size):
     cmd += "rescale width={size} height={size} ! "
 
     if w != 1.0 or h != 1.0:
-        cmd += "loop number=2 ! "
+        cmd += "loop number={} ! ".format(math.ceil(total / ze))
 
     cmd += "map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
     cmd = cmd.format(**parameters)

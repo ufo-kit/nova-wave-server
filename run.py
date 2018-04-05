@@ -86,15 +86,18 @@ def create(map_id, data_path, subsets, origin, dimensions, size):
     height, width = data.shape
     del data
 
+    def _round(x, a=4):
+        return int(a * round(float(x) / a))
+
     output_path += '/%05i.jpg'
     number = 16 * 16
     total = number * subsets
-    xa = int(x * width)
-    ya = int(y * height)
-    za = int(z * len(files))
-    ze = int(w * len(files))
-    slice_width = int(min(width - xa, w * width))
-    slice_height = int(min(height - ya, h * height))
+    xa = _round(x * width)
+    ya = _round(y * height)
+    za = _round(z * len(files))
+    ze = _round(w * len(files))
+    slice_width = _round(min(width - xa, w * width))
+    slice_height = _round(min(height - ya, h * height))
 
     parameters = dict(path=data_path, output=output_path,
                       x=xa, y=ya, z=za, ze=ze,
@@ -113,7 +116,6 @@ def create(map_id, data_path, subsets, origin, dimensions, size):
 
     cmd += "map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
     cmd = cmd.format(**parameters)
-
     output = subprocess.call(shlex.split(cmd))
 
 

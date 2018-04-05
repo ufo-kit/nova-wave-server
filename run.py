@@ -90,20 +90,27 @@ def create(map_id, data_path, subsets, origin, dimensions, size):
     total = number * subsets
     xa = int(x * width)
     ya = int(y * height)
+    za = int(z * len(files))
+    ze = int(w * len(files))
     slice_width = int(min(width - xa, w * width))
     slice_height = int(min(height - ya, h * height))
 
     parameters = dict(path=data_path, output=output_path,
-                      x=xa, y=ya, za=int(z * len(files)),
+                      x=xa, y=ya, z=za, ze=ze,
                       w=slice_width, h=slice_height,
                       size=size, number=number, total=total)
 
-    cmd = "ufo-launch read path={path} number={total} ! crop x={x} y={y} width={w} height={h} ! "
+    cmd = "ufo-launch read path={path} start={z} number={ze} ! crop x={x} y={y} width={w} height={h} ! "
 
     if w == 1.0 and h == 1.0:
         cmd += "mask ! "
 
-    cmd += "rescale width={size} height={size} ! map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
+    cmd += "rescale width={size} height={size} ! "
+
+    if w != 1.0 or h != 1.0:
+        cmd += "loop number=2 ! "
+
+    cmd += "map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
     cmd = cmd.format(**parameters)
 
     output = subprocess.call(shlex.split(cmd))
@@ -153,9 +160,7 @@ def get_map(map_id, subset=None):
     if not os.path.exists(path):
         abort(404)
 
-    path += '/{:05}.jpg'.format(int(subset))
-
-    return send_file(path, mimetype='image/jpeg')
+    return send_file(path + '/{:05}.jpg'.format(int(subset)), mimetype='image/jpeg')
 
 
 @app.route('/queue/<map_id>', methods=['GET'])

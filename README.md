@@ -1,8 +1,15 @@
-# ufo-wave-server
+# nova-wave-server
 
 The ufo-wave-server is a server that generates slice maps from raw data for
 consumption with the WAVE JavaScript client renderer and uses the UFO framework
 to do the low-level image processing.
+
+## Dependencies
+
+* UFO for processing
+* Flask for serving
+
+## Usage
 
 The client has to
 
@@ -18,7 +25,7 @@ The client has to
 See the `test.py` script for an example.
 
 
-## General parameters
+### General parameters
 
 All parameters to the POST request have to be JSON encoded and send within a
 single JSON object.
@@ -39,7 +46,7 @@ single JSON object.
 * `subsets` specifies the number of slice maps to generate.
 
 
-## Response
+### Response
 
 The result is either a JPEG of size 8 × `size` containing the slice map or a
 JSON response containing an error message field.

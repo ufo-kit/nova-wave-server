@@ -114,7 +114,7 @@ def create(map_id, data_path, subsets, origin, dimensions, size):
     if w != 1.0 or h != 1.0:
         cmd += "loop number={} ! ".format(math.ceil(total / ze))
 
-    cmd += "map-slice number={number} ! write minimum=0 maximum=255 filename={output}"
+    cmd += "map-slice number={number} ! write minimum=0 maximum=255 jpeg-quality=85 filename={output}"
     cmd = cmd.format(**parameters)
     output = subprocess.call(shlex.split(cmd))
 

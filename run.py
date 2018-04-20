@@ -192,7 +192,7 @@ def get_local_ip_address():
 
 def register(host):
     data = dict(name=SERVICE_NAME,
-                url='http://{}:{}'.format(get_local_ip_address(), 5000),
+                url='http://{}:{}'.format(get_local_ip_address(), 5001),
                 secret=SERVICE_SECRET)
     requests.post('/'.join((host, 'services')), data=data)
 

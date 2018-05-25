@@ -157,13 +157,13 @@ def make_map():
 
 @app.route('/maps/<map_id>')
 @app.route('/maps/<map_id>/<subset>', methods=['GET'])
-def get_map(map_id, subset=None):
-    path = identifier_to_path(map_id)
+def get_map(map_id, subset):
+    path = os.path.join(identifier_to_path(map_id), '{:05}.jpg'.format(int(subset)))
 
     if not os.path.exists(path):
         abort(404)
 
-    return send_file(path + '/{:05}.jpg'.format(int(subset)), mimetype='image/jpeg')
+    return send_file(path, mimetype='image/jpeg')
 
 
 @app.route('/queue/<map_id>', methods=['GET'])
